@@ -59,6 +59,7 @@
 class contrail::vrouter::config (
   $step = hiera('step'),
   $compute_device         = 'eth0',
+  $contrail_version,
   $discovery_ip           = '127.0.0.1',
   $device                 = 'eth0',
   $gateway                = '127.0.0.1',
@@ -147,9 +148,11 @@ class contrail::vrouter::config (
   }
 
   if !$is_dpdk {
-    file { '/etc/contrail/vrouter_nodemgr_param' :
-      ensure  => file,
-      content => "DISCOVERY=${discovery_ip}",
+    if $contrail_version == 3 {
+      file { '/etc/contrail/vrouter_nodemgr_param' :
+        ensure  => file,
+        content => "DISCOVERY=${discovery_ip}",
+      }
     }
   }
   if $::ipaddress_vhost0 != $vhost_ip {

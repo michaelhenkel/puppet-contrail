@@ -9,20 +9,57 @@
 #
 class contrail::vrouter::install (
   $is_dpdk = undef,
+  $contrail_version,
 ) {
 
   if !$is_dpdk {
-    package { 'contrail-openstack-vrouter' :
-      ensure => latest,
-    }
-    package { 'contrail-vrouter' :
-      ensure => latest,
-    }
-    package { 'contrail-vrouter-init' :
-      ensure => latest,
-    }
-    package { 'contrail-vrouter-agent' :
-      ensure => latest,
+    if $contrail_version == 3 {
+      package { 'contrail-openstack-vrouter' :
+        ensure => latest,
+      }
+      package { 'contrail-vrouter' :
+        ensure => latest,
+      }
+      package { 'contrail-vrouter-init' :
+        ensure => latest,
+      }
+      package { 'contrail-vrouter-agent' :
+        ensure => latest,
+      }
+    } else {
+      package { 'contrail-vrouter' :
+        ensure => latest,
+      }
+      package { 'contrail-vrouter-init' :
+        ensure => latest,
+      }
+      package { 'contrail-vrouter-agent' :
+        ensure => latest,
+      } ->
+      exec { 'ldconfig vrouter agent':
+        command => '/sbin/ldconfig',
+      } ->
+      exec { 'enable vrouter supervisor daemon':
+        command => '/bin/systemctl enable supervisor-vrouter',
+      }
+      package { 'contrail-nova-vif' :
+        ensure => latest,
+      }
+      package { 'contrail-lib' :
+        ensure => latest,
+      }
+      package { 'contrail-nodemgr' :
+        ensure => latest,
+      }
+      package { 'contrail-utils' :
+        ensure => latest,
+      }
+      package { 'contrail-setup' :
+        ensure => latest,
+      }
+      package { 'contrail-vrouter-common' :
+        ensure => latest,
+      }    
     }
   } else {
     package { 'contrail-nova-vif' :
