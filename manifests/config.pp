@@ -10,11 +10,11 @@
 class contrail::config (
   $package_name = $contrail::params::config_package_name,
   $api_config,
-  $basicauthusers_property,
+  $basicauthusers_property = [],
   $config_nodemgr_config,
   $contrail_version,
   $device_manager_config,
-  $discovery_config,
+  $discovery_config = {},
   $keystone_config,
   $schema_config,
   $svc_monitor_config,
