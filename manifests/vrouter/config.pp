@@ -88,14 +88,17 @@ class contrail::vrouter::config (
 
   validate_hash($vrouter_agent_config)
   validate_hash($vrouter_nodemgr_config)
-  validate_hash($keystone_config)
+  validate_hash($vnc_api_lib_config)
 
-  $contrail_keystone_config = { 'path' => '/etc/contrail/contrail-keystone-auth.conf' }
   $contrail_vrouter_agent_config = { 'path' => '/etc/contrail/contrail-vrouter-agent.conf' }
   $contrail_vrouter_nodemgr_config = { 'path' => '/etc/contrail/contrail-vrouter-nodemgr.conf' }
   $contrail_vnc_api_lib_config = { 'path' => '/etc/contrail/vnc_api_lib.ini' }
 
-  create_ini_settings($keystone_config, $contrail_keystone_config)
+  if $keystone_cfg {
+    validate_hash($keystone_cfg)
+    $contrail_keystone_config = { 'path' => '/etc/contrail/contrail-keystone-auth.conf' }
+    create_ini_settings($keystone_cfg, $contrail_keystone_config)
+  }
   create_ini_settings($vrouter_agent_config, $contrail_vrouter_agent_config)
   create_ini_settings($vrouter_nodemgr_config, $contrail_vrouter_nodemgr_config)
   create_ini_settings($vnc_api_lib_config, $contrail_vnc_api_lib_config)
@@ -148,7 +151,7 @@ class contrail::vrouter::config (
   }
 
   if !$is_dpdk {
-    if $contrail_version == 3 {
+    if $contrail_version < 4 {
       file { '/etc/contrail/vrouter_nodemgr_param' :
         ensure  => file,
         content => "DISCOVERY=${discovery_ip}",
@@ -159,7 +162,7 @@ class contrail::vrouter::config (
     file { '/opt/contrail/utils/update_dev_net_config_files.py':
       ensure => file,
       source => '/usr/share/openstack-puppet/modules/contrail/files/vrouter/update_dev_net_config_files.py',
-    } -> 
+    } ->
     exec { '/bin/python /opt/contrail/utils/update_dev_net_config_files.py' :
       path => '/usr/bin',
       command => "/bin/python /opt/contrail/utils/update_dev_net_config_files.py \
