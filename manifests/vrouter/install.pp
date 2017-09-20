@@ -13,6 +13,7 @@ class contrail::vrouter::install (
 ) {
 
   $common_pkgs = [
+    'contrail-nova-vif',
     'contrail-vrouter-agent',
   ]
   $no_dpdk_common_pkgs = [
@@ -20,22 +21,20 @@ class contrail::vrouter::install (
     'contrail-vrouter-init',
   ]
   $v4_pkgs = [
-    'contrail-nova-vif',
     'contrail-lib',
     'contrail-nodemgr',
     'contrail-utils',
     'contrail-setup',
     'contrail-vrouter-common',
   ]
-  $v3_no_dkdk_pkgs = [
+  $v3_no_dpdk_pkgs = [
     'contrail-openstack-vrouter',
   ]
 
   if $contrail_version < 4 {
-    $ver_pkgs = $v3_no_dkdk_pkgs
-
+    $ver_pkgs = $v3_no_dpdk_pkgs
   } else {
-     $ver_pkgs = $v4_pkgs
+    $ver_pkgs = $v4_pkgs
   }
 
   if !$is_dpdk {
